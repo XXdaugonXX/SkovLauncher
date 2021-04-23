@@ -44,4 +44,6 @@ branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
 
-publish: always
+deploy:
+  on:
+    tags: true
