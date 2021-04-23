@@ -37,13 +37,16 @@ script:
       npm run cidarwin
     fi
 
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  on:
+    branch: master
+
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
-
-deploy:
-  on:
-    tags: true
