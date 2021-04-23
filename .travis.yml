@@ -43,3 +43,8 @@ before_cache:
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
+
+deploy:
+  skip_cleanup: true
+  on:
+    branch: master
