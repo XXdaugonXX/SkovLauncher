@@ -1,13 +1,13 @@
 {
-  "name": "skovlauncher",
-  "version": "0.0.6",
-  "productName": "Skov Launcher",
+  "name": "zayviellauncher",
+  "version": "0.0.7",
+  "productName": "Zayviel Launcher",
   "description": "Modded Minecraft Launcher",
   "author": "XXdaugonXX (https://github.com/XXdaugonXX/)",
   "license": "UNLICENSED",
-  "homepage": "https://github.com/XXdaugonXX/SkovLauncher",
+  "homepage": "https://github.com/XXdaugonXX/ZayvielLauncher",
   "bugs": {
-    "url": "https://github.com/XXdaugonXX/SkovLauncher/issues"
+    "url": "https://github.com/XXdaugonXX/ZayvielLauncher/issues"
   },
   "private": true,
   "main": "index.js",
@@ -48,6 +48,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/XXdaugonXX/SkovLauncher.git"
+    "url": "git+https://github.com/XXdaugonXX/ZayvielLauncher.git"
   }
 }

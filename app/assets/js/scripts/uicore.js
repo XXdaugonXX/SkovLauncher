@@ -49,7 +49,7 @@ if(!isDev){
                 loggerAutoUpdaterSuccess.log('New update available', info.version)
                 
                 if(process.platform === 'darwin'){
-                    info.darwindownload = `https://github.com/XXdaugonXX/SkovLauncher/releases/download/v${info.version}/Skovlauncher-setup-${info.version}.dmg`
+                    info.darwindownload = `https://github.com/XXdaugonXX/ZayvielLauncher/releases/download/v${info.version}/Zayviellauncher-setup-${info.version}.dmg`
                     showUpdateUI(info)
                 }
                 

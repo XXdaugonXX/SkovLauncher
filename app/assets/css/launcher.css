@@ -3775,3 +3775,28 @@ input:checked + .toggleSwitchSlider:before {
 .rotating {
     animation: rotating 10s linear infinite;
 }
+
+#loginMSButton {
+    background: none;
+    border: none;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    transform: scale(0.8, 0.8);
+    opacity: 1;
+}
+#loginMSButton:disabled {
+    color: rgba(255, 255, 255, 0.75);
+    pointer-events: none;
+}
+
+#loginMSButton:hover,
+#loginMSButton:focus {
+    text-shadow: 0px 0px 20px #fff;
+    opacity: 0.8;
+    outline: none;
+}
+
+#loginMSButton:active {
+    color: #c7c7c7;
+    text-shadow:  0px 0px 20px #c7c7c7;
+} 

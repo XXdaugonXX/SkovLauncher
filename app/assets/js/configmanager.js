@@ -6,7 +6,7 @@ const logger = require('./loggerutil')('%c[ConfigManager]', 'color: #a02d2a; fon
 
 const sysRoot = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Application Support' : process.env.HOME)
 // TODO change
-const dataPath = path.join(sysRoot, '.skovlauncher')
+const dataPath = path.join(sysRoot, '.zayviellauncher')
 
 // Forked processes do not have access to electron, so we have this workaround.
 const launcherDir = process.env.CONFIG_DIRECT_PATH || require('@electron/remote').app.getPath('userData')
@@ -103,7 +103,8 @@ const DEFAULT_CONFIG = {
     selectedServer: null, // Resolved
     selectedAccount: null,
     authenticationDatabase: {},
-    modConfigurations: []
+    modConfigurations: [],
+    microsoftAuth: {}
 }
 
 let config = null
@@ -685,4 +686,31 @@ exports.getAllowPrerelease = function(def = false){
  */
 exports.setAllowPrerelease = function(allowPrerelease){
     config.settings.launcher.allowPrerelease = allowPrerelease
+}
+
+exports.updateMicrosoftAuthAccount = function(uuid, accessToken, msAccessToken, msRefreshToken, msExpires, mcExpires){
+    config.authenticationDatabase[uuid].accessToken = accessToken
+    config.authenticationDatabase[uuid].expiresAt = mcExpires
+    config.authenticationDatabase[uuid].microsoft.access_token = msAccessToken
+    config.authenticationDatabase[uuid].microsoft.refresh_token = msRefreshToken
+    config.authenticationDatabase[uuid].microsoft.expires_at = msRefreshToken
+    return config.authenticationDatabase[uuid]
+}
+
+exports.addMsAuthAccount = function(uuid, accessToken, name, mcExpires, msAccessToken, msRefreshToken, msExpires){
+    config.selectedAccount = uuid
+    config.authenticationDatabase[uuid] = {
+        accessToken,
+        username: name.trim(),
+        uuid: uuid.trim(),
+        displayName: name.trim(),
+        expiresAt: mcExpires,
+        type: 'microsoft',
+        microsoft: {
+            access_token: msAccessToken,
+            refresh_token: msRefreshToken,
+            expires_at: msExpires
+        }
+    }
+    return config.authenticationDatabase[uuid]
 }

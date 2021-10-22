@@ -1,10 +1,8 @@
 <p align="center"><img src="./app/assets/images/SealCircle.png" width="150px" height="150px" alt="aventium softworks"></p>
 
-<h1 align="center">Helios Launcher</h1>
+<h1 align="center">Zayviel Launcher</h1>
 
-<em><h5 align="center">(formerly Electron Launcher)</h5></em>
-
-[<p align="center"><img src="https://img.shields.io/travis/XXdaugonXX/SkovLauncher.svg?style=for-the-badge" alt="travis">](https://travis-ci.org/XXdaugonXX/SkovLauncher) [<img src="https://img.shields.io/github/downloads/XXdaugonXX/SkovLauncher/total.svg?style=for-the-badge" alt="downloads">](https://github.com/XXdaguonXX/SkovLauncher/releases) <img src="https://forthebadge.com/images/badges/winter-is-coming.svg"  height="28px" alt="stark"></p>
+[<p align="center"><img src="https://img.shields.io/travis/XXdaugonXX/ZayvielLauncher.svg?style=for-the-badge" alt="travis">](https://travis-ci.org/XXdaugonXX/ZayvielLauncher) [<img src="https://img.shields.io/github/downloads/XXdaugonXX/ZayvielLauncher/total.svg?style=for-the-badge" alt="downloads">](https://github.com/XXdaguonXX/ZayvielLauncher/releases) <img src="https://forthebadge.com/images/badges/winter-is-coming.svg"  height="28px" alt="stark"></p>
 
 <p align="center">Join modded servers without worrying about installing Java, Forge, or other mods. We'll handle that for you.</p>
 
@@ -38,24 +36,24 @@ This is not an exhaustive list. Download and install the launcher to gauge all i
 
 ## Downloads
 
-You can download from [GitHub Releases](https://github.com/XXdaugonXX/SkovLauncher/releases)
+You can download from [GitHub Releases](https://github.com/XXdaugonXX/ZayvielLauncher/releases)
 
 #### Latest Release
 
-[![](https://img.shields.io/github/release/XXdaugonXX/SkovLauncher.svg?style=flat-square)](https://github.com/XXdaugonXX/SkovLauncher/releases/latest)
+[![](https://img.shields.io/github/release/XXdaugonXX/ZayvielLauncher.svg?style=flat-square)](https://github.com/XXdaugonXX/ZayvielLauncher/releases/latest)
 
 #### Latest Pre-Release
-[![](https://img.shields.io/github/release/XXdaugonXX/SkovLauncher/all.svg?style=flat-square)](https://github.com/XXdaugonXX/SkovLauncher/releases)
+[![](https://img.shields.io/github/release/XXdaugonXX/ZayvielLauncher/all.svg?style=flat-square)](https://github.com/XXdaugonXX/ZayvielLauncher/releases)
 
 **Supported Platforms**
 
-If you download from the [Releases](https://github.com/XXdaugonXX/SkovLauncher/releases) tab, select the installer for your system.
+If you download from the [Releases](https://github.com/XXdaugonXX/ZayvielLauncher/releases) tab, select the installer for your system.
 
 | Platform | File |
 | -------- | ---- |
-| Windows x64 | `Skov-Launcher-setup-VERSION.exe` |
-| macOS | `Skov-Launcher-setup-VERSION.dmg` |
-| Linux x64 | `Skov-Launcher-setup-VERSION.AppImage` |
+| Windows x64 | `Zayviel-Launcher-setup-VERSION.exe` |
+| macOS | `Zayviel-Launcher-setup-VERSION.dmg` |
+| Linux x64 | `Zayviel-Launcher-setup-VERSION.AppImage` |
 
 ## Console
 
@@ -89,8 +87,8 @@ This section details the setup of a basic developmentment environment.
 **Clone and Install Dependencies**
 
 ```console
-> git clone https://github.com/XXdaugonXX/SkovLauncher.git
-> cd SkovLauncher
+> git clone https://github.com/XXdaugonXX/ZayvielLauncher.git
+> cd ZayvielLauncher
 > npm install
 ```
 
@@ -209,6 +207,6 @@ The best way to contact the developers is on Discord.
 [rendererprocess]: https://electronjs.org/docs/tutorial/application-architecture#main-and-renderer-processes 'Renderer Process'
 [chromedebugger]: https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome 'Debugger for Chrome'
 [discord]: https://discord.gg/zNWUXdt 'Discord'
-[wiki]: https://github.com/XXdaugonXX/SkovLauncher/wiki 'wiki'
+[wiki]: https://github.com/XXdaugonXX/ZayvielLauncher/wiki 'wiki'
 [nebula]: https://github.com/dscalzi/Nebula 'dscalzi/Nebula'
 [v2branch]: https://github.com/dscalzi/HeliosLauncher/tree/ts-refactor 'v2 branch'
