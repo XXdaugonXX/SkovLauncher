@@ -2,7 +2,7 @@
 
 <h1 align="center">Zayviel Launcher</h1>
 
-[<p align="center"><img src="https://img.shields.io/travis/com/XXdaugonXX/ZayvielLauncher?style=for-the-badge" alt="travis">](https://travis-ci.org/XXdaugonXX/ZayvielLauncher) [<img src="https://img.shields.io/github/downloads/XXdaugonXX/ZayvielLauncher/total.svg?style=for-the-badge" alt="downloads">](https://github.com/XXdaguonXX/ZayvielLauncher/releases)
+[<p align="center"><img src="https://img.shields.io/travis/com/XXdaugonXX/ZayvielLauncher?style=for-the-badge" alt="travis">](https://travis-ci.org/XXdaugonXX/ZayvielLauncher) [<img src="https://img.shields.io/github/downloads/XXdaugonXX/ZayvielLauncher/latest/total?style=for-the-badge" alt="downloads">](https://github.com/XXdaguonXX/ZayvielLauncher/releases)
 
 <p align="center">Join modded servers without worrying about installing Java, Forge, or other mods. We'll handle that for you.</p>
 
