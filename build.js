@@ -18,8 +18,8 @@ function getCurrentPlatform(){
 builder.build({
     targets: (process.argv[2] != null && Platform[process.argv[2]] != null ? Platform[process.argv[2]] : getCurrentPlatform()).createTarget(),
     config: {
-        appId: 'skovlauncher',
-        productName: 'Skov Launcher',
+        appId: 'zayviellauncher',
+        productName: 'Zayviel Launcher',
         artifactName: '${productName}-setup-${version}.${ext}',
         copyright: 'Copyright © 2021 XXdaugonXX',
         directories: {
