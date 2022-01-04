@@ -49,7 +49,7 @@ if(!isDev){
                 loggerAutoUpdaterSuccess.log('New update available', info.version)
                 
                 if(process.platform === 'darwin'){
-                    info.darwindownload = `https://github.com/dscalzi/ZayvielLauncher/releases/download/v${info.version}/zayviellauncher-setup-${info.version}${process.arch === 'arm64' ? '-arm64' : ''}.dmg`
+                    info.darwindownload = `https://github.com/XXdaugonXX/ZayvielLauncher/releases/download/v${info.version}/zayviellauncher-setup-${info.version}${process.arch === 'arm64' ? '-arm64' : ''}.dmg`
                     showUpdateUI(info)
                 }
                 
