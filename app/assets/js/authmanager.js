@@ -16,8 +16,10 @@ const Microsoft     = require('./microsoft')
 const logger        = LoggerUtil('%c[AuthManager]', 'color: #a02d2a; font-weight: bold')
 const loggerSuccess = LoggerUtil('%c[AuthManager]', 'color: #209b07; font-weight: bold')
 
-async function validateSelectedMojang() {
-    const current = ConfigManager.getSelectedAccount()
+// Validation
+
+async function validateSelectedMojang(selectedAccount) {
+    const current = selectedAccount
     const isValid = await Mojang.validate(current.accessToken, ConfigManager.getClientToken())
     if(!isValid){
         try {
@@ -25,7 +27,7 @@ async function validateSelectedMojang() {
             ConfigManager.updateAuthAccount(current.uuid, session.accessToken)
             ConfigManager.save()
         } catch(err) {
-            logger.log('Error while validating selected profile:', err)
+            logger.debug('Error while validating selected profile:', err)
             if(err && err.error === 'ForbiddenOperationException'){
                 // What do we do?
             }
@@ -40,26 +42,24 @@ async function validateSelectedMojang() {
     }
 }
 
-async function validateSelectedMicrosoft() {
+async function validateSelectedMicrosoft(selectedAccount) {
     try {
-        const current = ConfigManager.getSelectedAccount()
+        const current = selectedAccount
         const now = new Date().getTime()
         const MCExpiresAt = Date.parse(current.expiresAt)
         const MCExpired = now > MCExpiresAt
 
         if(MCExpired) {
-            const MSExpiresAt = Date.parse(current.microsoft.expires_at)
+            const MSExpiresAt = Date.parse(ConfigManager.getMicrosoftAuth().expires_at)
             const MSExpired = now > MSExpiresAt
 
             if (MSExpired) {
-                const newAccessToken = await Microsoft.refreshAccessToken(current.microsoft.refresh_token)
-                const newMCAccessToken = await Microsoft.authMinecraft(newAccessToken.access_token)
-                ConfigManager.updateMicrosoftAuthAccount(current.uuid, newMCAccessToken.access_token, newAccessToken.expires_at)
+                const newAccessToken = await Microsoft.refreshAccessToken(ConfigManager.getMicrosoftAuth)
+                ConfigManager.updateMicrosoftAuth(newAccessToken.access_token, newAccessToken.expires_at)
                 ConfigManager.save()
-                return true
             }
-            const newMCAccessToken = await Microsoft.authMinecraft(current.microsoft.access_token)
-            ConfigManager.updateMicrosoftAuthAccount(current.uuid, newMCAccessToken.access_token, current.microsoft.access_token, current.microsoft.expires_at, newMCAccessToken.expires_at)
+            const newMCAccessToken = await Microsoft.authMinecraft(ConfigManager.getMicrosoftAuth().access_token)
+            ConfigManager.updateAuthAccount(current.uuid, newMCAccessToken.access_token, newMCAccessToken.expires_at)
             ConfigManager.save()
 
             return true
@@ -71,7 +71,6 @@ async function validateSelectedMicrosoft() {
     }
 }
 
-// Exports
 // Functions
 
 /**
@@ -112,11 +111,6 @@ exports.addAccount = async function(username, password){
 exports.removeAccount = async function(uuid){
     try {
         const authAcc = ConfigManager.getAuthAccount(uuid)
-        if(authAcc.type === 'microsoft'){
-            ConfigManager.removeAuthAccount(uuid)
-            ConfigManager.save()
-            return Promise.resolve()
-        }
         await Mojang.invalidate(authAcc.accessToken, ConfigManager.getClientToken())
         ConfigManager.removeAuthAccount(uuid)
         ConfigManager.save()
@@ -137,34 +131,23 @@ exports.removeAccount = async function(uuid){
  * otherwise false.
  */
 exports.validateSelected = async function(){
-    const current = ConfigManager.getSelectedAccount()
-    const isValid = await Mojang.validate(current.accessToken, ConfigManager.getClientToken())
-    if(!isValid){
-        try{
-            if (ConfigManager.getSelectedAccount().type === 'microsoft') {
-                const validate = await validateSelectedMicrosoft()
-                return validate
-            } else {
-                const validate = await validateSelectedMojang()
-                return validate
-            }
-        } catch (error) {
-            return Promise.reject(error)
-        }
-    } else return true
+    const selectedAccount = ConfigManager.getSelectedAccount()
+  if (selectedAccount.type === 'microsoft') {
+      const validate = await validateSelectedMicrosoft(selectedAccount)
+      return validate
+  } else {
+      const validate = await validateSelectedMojang(selectedAccount)
+      return validate
+  }
 }
 
 exports.addMSAccount = async authCode => {
     try {
         const accessToken = await Microsoft.getAccessToken(authCode)
+        ConfigManager.setMicrosoftAuth(accessToken)
         const MCAccessToken = await Microsoft.authMinecraft(accessToken.access_token)
-        const MCProfile = await Microsoft.getMCProfile(MCAccessToken.access_token).catch(err => {})
-        if(!MCProfile) {
-            return Promise.reject({
-                message: 'The account you are trying to login with has not purchased a copy of Minecraft You may purchase a copy on <a href="https://minecraft.net/">Minecraft.net</a>.'
-            })
-        }
-        const ret = ConfigManager.addMsAuthAccount(MCProfile.id, MCAccessToken.access_token, MCProfile.name, MCAccessToken.expires_at, accessToken.access_token, accessToken.refresh_token)
+        const MCProfile = await Microsoft.getMCProfile(MCAccessToken.access_token)
+        const ret = ConfigManager.addAuthAccount(MCProfile.id, MCAccessToken.access_token, MCProfile.name, MCProfile.name, MCAccessToken.expires_at, 'microsoft')
         ConfigManager.save()
 
         return ret

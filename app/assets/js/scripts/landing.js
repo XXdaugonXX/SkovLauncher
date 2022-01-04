@@ -4,7 +4,8 @@
 // Requirements
 const cp                      = require('child_process')
 const crypto                  = require('crypto')
-const {URL}                   = require('url')
+const { URL }                 = require('url')
+const { getServerStatus }     = require('helios-core')
 
 // Internal Requirements
 const DiscordWrapper          = require('./assets/js/discordwrapper')
@@ -124,13 +125,13 @@ document.getElementById('avatarOverlay').onclick = (e) => {
 
 // Bind selected account
 function updateSelectedAccount(authUser){
-    let username = 'Ingen konto valgt'
+    let username = 'No Account Selected'
     if(authUser != null){
         if(authUser.displayName != null){
             username = authUser.displayName
         }
         if(authUser.uuid != null){
-            document.getElementById('avatarContainer').style.backgroundImage = `url('https://crafatar.com/renders/body/${authUser.uuid}')`
+            document.getElementById('avatarContainer').style.backgroundImage = `url('https://mc-heads.net/body/${authUser.uuid}/right')`
         }
     }
     user_text.innerHTML = username
@@ -144,14 +145,14 @@ function updateSelectedServer(serv){
     }
     ConfigManager.setSelectedServer(serv != null ? serv.getID() : null)
     ConfigManager.save()
-    server_selection_button.innerHTML = '\u2022 ' + (serv != null ? serv.getName() : 'Ingen Server Valgt')
+    server_selection_button.innerHTML = '\u2022 ' + (serv != null ? serv.getName() : 'No Server Selected')
     if(getCurrentView() === VIEWS.settings){
         animateModsTabRefresh()
     }
     setLaunchEnabled(serv != null)
 }
 // Real text is set in uibinder.js on distributionIndexDone.
-server_selection_button.innerHTML = '\u2022 Loader..'
+server_selection_button.innerHTML = '\u2022 Loading..'
 server_selection_button.onclick = (e) => {
     e.target.blur()
     toggleServerSelection(true)
@@ -225,11 +226,11 @@ const refreshServerStatus = async function(fade = false){
 
     try {
         const serverURL = new URL('my://' + serv.getAddress())
-        const servStat = await ServerStatus.getStatus(serverURL.hostname, serverURL.port)
-        if(servStat.online){
-            pLabel = 'PLAYERS'
-            pVal = servStat.onlinePlayers + '/' + servStat.maxPlayers
-        }
+
+        const servStat = await getServerStatus(47, serverURL.hostname, Number(serverURL.port))
+        console.log(servStat)
+        pLabel = 'PLAYERS'
+        pVal = servStat.players.online + '/' + servStat.players.max
 
     } catch (err) {
         loggerLanding.warn('Unable to refresh server status, assuming offline.')
@@ -254,6 +255,8 @@ refreshMojangStatuses()
 // Set refresh rate to once every 5 minutes.
 let mojangStatusListener = setInterval(() => refreshMojangStatuses(true), 300000)
 let serverStatusListener = setInterval(() => refreshServerStatus(true), 300000)
+
+setTimeout(() => refreshMojangStatuses(true), 1000) // Workaround to make sure statuses are correctly shown, else its a kinda broken
 
 /**
  * Shows an error overlay, toggles off the launch area.
@@ -375,7 +378,7 @@ function asyncSystemScan(mcVersion, launchAfter = true){
             if(m.result === true){
 
                 // Oracle JRE enqueued successfully, begin download.
-                setLaunchDetails('Downloader Java..')
+                setLaunchDetails('Downloading Java..')
                 sysAEx.send({task: 'execute', function: 'processDlQueues', argsArr: [[{id:'java', limit:1}]]})
 
             } else {
@@ -386,7 +389,6 @@ function asyncSystemScan(mcVersion, launchAfter = true){
                     'Uforventet Fejl:<br>Java Download Fejlede.',
                     'Desværre har vi ramt en fejl mens vi forsøgte at installere Java. Du er til til at installere en kopi manuelt. Venligst check vores <a href="https://github.com/dscalzi/HeliosLauncher/wiki">Troubleshooting Guide</a> for flere detaljer og indstruktioner. (OBS. Guiden er på engelsk)',
                     'Jeg Forstår'
-
                 )
                 setOverlayHandler(() => {
                     toggleOverlay(false)
@@ -414,7 +416,7 @@ function asyncSystemScan(mcVersion, launchAfter = true){
                     remote.getCurrentWindow().setProgressBar(2)
 
                     // Wait for extration to complete.
-                    const eLStr = 'Pakker ud'
+                    const eLStr = 'Extracting'
                     let dotStr = ''
                     setLaunchDetails(eLStr)
                     extractListener = setInterval(() => {
@@ -440,7 +442,7 @@ function asyncSystemScan(mcVersion, launchAfter = true){
                         extractListener = null
                     }
 
-                    setLaunchDetails('Java Installeret!')
+                    setLaunchDetails('Java Installed!')
 
                     if(launchAfter){
                         dlAsync()
@@ -456,7 +458,7 @@ function asyncSystemScan(mcVersion, launchAfter = true){
     })
 
     // Begin system Java scan.
-    setLaunchDetails('Tjekker system info..')
+    setLaunchDetails('Checking system info..')
     sysAEx.send({task: 'execute', function: 'validateJava', argsArr: [ConfigManager.getDataDirectory()]})
 
 }
@@ -485,12 +487,12 @@ function dlAsync(login = true){
 
     if(login) {
         if(ConfigManager.getSelectedAccount() == null){
-            loggerLanding.error('Du skal være logget ind på en konto.')
+            loggerLanding.error('You must be logged into an account.')
             return
         }
     }
 
-    setLaunchDetails('Venligst Vent..')
+    setLaunchDetails('Please wait..')
     toggleLaunchArea(true)
     setLaunchPercentage(0, 100)
 
@@ -521,12 +523,12 @@ function dlAsync(login = true){
     })
     aEx.on('error', (err) => {
         loggerLaunchSuite.error('Error during launch', err)
-        showLaunchFailure('Fejl Ved Opstart', err.message || 'Se console (CTRL + Shift + i) for flere oplysninger.')
+        showLaunchFailure('Error During Launch', err.message || 'See console (CTRL + Shift + i) for more details.')
     })
     aEx.on('close', (code, signal) => {
         if(code !== 0){
             loggerLaunchSuite.error(`AssetExec exited with code ${code}, assuming error.`)
-            showLaunchFailure('Fejl Ved Opstart', 'Se console (CTRL + Shift + i) for flere oplysninger.')
+            showLaunchFailure('Error During Launch', 'See console (CTRL + Shift + i) for more details.')
         }
     })
 
@@ -538,27 +540,27 @@ function dlAsync(login = true){
                 case 'distribution':
                     setLaunchPercentage(20, 100)
                     loggerLaunchSuite.log('Validated distibution index.')
-                    setLaunchDetails('Loader version information..')
+                    setLaunchDetails('Loading version information..')
                     break
                 case 'version':
                     setLaunchPercentage(40, 100)
                     loggerLaunchSuite.log('Version data loaded.')
-                    setLaunchDetails('Validere indholds integritet..')
+                    setLaunchDetails('Validating asset integrity..')
                     break
                 case 'assets':
                     setLaunchPercentage(60, 100)
                     loggerLaunchSuite.log('Asset Validation Complete')
-                    setLaunchDetails('Validere biblioteks integritet..')
+                    setLaunchDetails('Validating library integrity..')
                     break
                 case 'libraries':
                     setLaunchPercentage(80, 100)
                     loggerLaunchSuite.log('Library validation complete.')
-                    setLaunchDetails('Validere andre filer integritet..')
+                    setLaunchDetails('Validating miscellaneous file integrity..')
                     break
                 case 'files':
                     setLaunchPercentage(100, 100)
                     loggerLaunchSuite.log('File validation complete.')
-                    setLaunchDetails('Downloader filer..')
+                    setLaunchDetails('Downloading files..')
                     break
             }
         } else if(m.context === 'progress'){
@@ -576,7 +578,7 @@ function dlAsync(login = true){
                     remote.getCurrentWindow().setProgressBar(2)
 
                     // Download done, extracting.
-                    const eLStr = 'Udpakker biblioteker'
+                    const eLStr = 'Extracting libraries'
                     let dotStr = ''
                     setLaunchDetails(eLStr)
                     progressListener = setInterval(() => {
@@ -600,7 +602,7 @@ function dlAsync(login = true){
                         progressListener = null
                     }
 
-                    setLaunchDetails('Klargør til start..')
+                    setLaunchDetails('Preparing to launch..')
                     break
             }
         } else if(m.context === 'error'){
@@ -610,13 +612,13 @@ function dlAsync(login = true){
                     
                     if(m.error.code === 'ENOENT'){
                         showLaunchFailure(
-                            'Download Fejl',
-                            'Kunne ikke forbinde til fil serveren. Vær sikker på du er forbundet til internettet og prøv igen.'
+                            'Download Error',
+                            'Could not connect to the file server. Ensure that you are connected to the internet and try again.'
                         )
                     } else {
                         showLaunchFailure(
-                            'Download Fejl',
-                            'Check console (CTRL + Shift + i) for flere oplysninger. Venligst prøv igen.'
+                            'Download Error',
+                            'Check the console (CTRL + Shift + i) for more details. Please try again.'
                         )
                     }
 
@@ -635,7 +637,7 @@ function dlAsync(login = true){
                 loggerLaunchSuite.error('Error during validation:', m.result)
 
                 loggerLaunchSuite.error('Error during launch', m.result.error)
-                showLaunchFailure('Fejl ved opstart', 'Venligst check console (CTRL + Shift + i) for flere oplysninger.')
+                showLaunchFailure('Error During Launch', 'Please check the console (CTRL + Shift + i) for more details.')
 
                 allGood = false
             }
@@ -655,7 +657,7 @@ function dlAsync(login = true){
                 const onLoadComplete = () => {
                     toggleLaunchArea(false)
                     if(hasRPC){
-                        DiscordWrapper.updateDetails('Loader spil..')
+                        DiscordWrapper.updateDetails('Loading game..')
                     }
                     proc.stdout.on('data', gameStateChange)
                     proc.stdout.removeListener('data', tempListener)
@@ -706,7 +708,6 @@ function dlAsync(login = true){
 
                     setLaunchDetails('Færdig, Nyd dit ophold på serveren!')
 
-
                     // Init Discord Hook
                     const distro = DistroManager.getDistribution()
                     if(distro.discord != null && serv.discord != null){
@@ -737,7 +738,7 @@ function dlAsync(login = true){
     // Begin Validations
 
     // Validate Forge files.
-    setLaunchDetails('Loader server information..')
+    setLaunchDetails('Loading server information..')
 
     refreshDistributionIndex(true, (data) => {
         onDistroRefresh(data)
@@ -752,7 +753,7 @@ function dlAsync(login = true){
         }, (err) => {
             loggerLaunchSuite.error('Unable to refresh distribution index.', err)
             if(DistroManager.getDistribution() == null){
-                showLaunchFailure('Fatal Fejl', 'Kunne ikke loade en kopi af distributions indexed. Se console (CTRL + Shift + i) for flere oplysninger.')
+                showLaunchFailure('Fatal Error', 'Could not load a copy of the distribution index. See the console (CTRL + Shift + i) for more details.')
 
                 // Disconnect from AssetExec
                 aEx.disconnect()
@@ -864,7 +865,7 @@ let newsLoadingListener = null
  */
 function setNewsLoading(val){
     if(val){
-        const nLStr = 'Tjekker efter Nyhedder'
+        const nLStr = 'Checking for News'
         let dotStr = '..'
         nELoadSpan.innerHTML = nLStr + dotStr
         newsLoadingListener = setInterval(() => {

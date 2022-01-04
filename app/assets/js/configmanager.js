@@ -56,7 +56,7 @@ exports.getAbsoluteMaxRAM = function(){
 
 function resolveMaxRAM(){
     const mem = os.totalmem()
-    return mem >= 16000000000 ? '8G' :(mem >= 8000000000 ? '4G' : (mem >= 6000000000 ? '3G' : '2G'))
+    return mem >= 8000000000 ? '4G' : (mem >= 6000000000 ? '3G' : '2G')
 }
 
 function resolveMinRAM(){
@@ -328,6 +328,7 @@ exports.getAuthAccount = function(uuid){
  */
 exports.updateAuthAccount = function(uuid, accessToken){
     config.authenticationDatabase[uuid].accessToken = accessToken
+    config.authenticationDatabase[uuid].expiresAt = expiresAt
     return config.authenticationDatabase[uuid]
 }
 
@@ -341,13 +342,15 @@ exports.updateAuthAccount = function(uuid, accessToken){
  * 
  * @returns {Object} The authenticated account object created by this action.
  */
-exports.addAuthAccount = function(uuid, accessToken, username, displayName){
+ exports.addAuthAccount = function(uuid, accessToken, username, displayName, expiresAt = null, type = 'mojang'){
     config.selectedAccount = uuid
     config.authenticationDatabase[uuid] = {
         accessToken,
         username: username.trim(),
         uuid: uuid.trim(),
-        displayName: displayName.trim()
+        displayName: displayName.trim(),
+        expiresAt: expiresAt,
+        type: type
     }
     return config.authenticationDatabase[uuid]
 }
@@ -688,29 +691,17 @@ exports.setAllowPrerelease = function(allowPrerelease){
     config.settings.launcher.allowPrerelease = allowPrerelease
 }
 
-exports.updateMicrosoftAuthAccount = function(uuid, accessToken, msAccessToken, msRefreshToken, msExpires, mcExpires){
-    config.authenticationDatabase[uuid].accessToken = accessToken
-    config.authenticationDatabase[uuid].expiresAt = mcExpires
-    config.authenticationDatabase[uuid].microsoft.access_token = msAccessToken
-    config.authenticationDatabase[uuid].microsoft.refresh_token = msRefreshToken
-    config.authenticationDatabase[uuid].microsoft.expires_at = msRefreshToken
-    return config.authenticationDatabase[uuid]
+exports.setMicrosoftAuth = microsoftAuth => {
+    config.microsoftAuth = microsoftAuth
 }
 
-exports.addMsAuthAccount = function(uuid, accessToken, name, mcExpires, msAccessToken, msRefreshToken, msExpires){
-    config.selectedAccount = uuid
-    config.authenticationDatabase[uuid] = {
-        accessToken,
-        username: name.trim(),
-        uuid: uuid.trim(),
-        displayName: name.trim(),
-        expiresAt: mcExpires,
-        type: 'microsoft',
-        microsoft: {
-            access_token: msAccessToken,
-            refresh_token: msRefreshToken,
-            expires_at: msExpires
-        }
-    }
-    return config.authenticationDatabase[uuid]
+exports.getMicrosoftAuth = () => {
+    return config.microsoftAuth
 }
+
+exports.updateMicrosoftAuth = (accessToken, expiresAt) => {
+    config.microsoftAuth.access_token = accessToken
+    config.microsoftAuth.expires_at = expiresAt
+
+    return config.microsoftAuth
+}  

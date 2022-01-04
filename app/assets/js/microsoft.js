@@ -1,14 +1,14 @@
 // Requirements
 const request = require('request')
+// const logger = require('./loggerutil')('%c[Microsoft]', 'color: #01a6f0; font-weight: bold')
 
 // Constants
 const clientId = 'd5b2c390-be84-4057-a249-8a26d8f360bc'
-
 const tokenUri = 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token'
 const authXBLUri = 'https://user.auth.xboxlive.com/user/authenticate'
 const authXSTSUri = 'https://xsts.auth.xboxlive.com/xsts/authorize'
 const authMCUri = 'https://api.minecraftservices.com/authentication/login_with_xbox'
-const profileURI = 'https://api.minecraftservices.com/minecraft/profile'
+const profileURI ='https://api.minecraftservices.com/minecraft/profile'
 
 // Functions
 function requestPromise(uri, options) {
@@ -16,7 +16,7 @@ function requestPromise(uri, options) {
         request(uri, options, (error, response, body) => {
             if (error) {
                 reject(error)
-            } else if (response.statusCode !== 200) {
+            } else if (response.statusCode !== 200){
                 reject([response.statusCode, response.statusMessage, response])
             } else {
                 resolve(response)
@@ -68,23 +68,9 @@ function getXSTSToken(XBLToken) {
             }
         }
         requestPromise(authXSTSUri, options).then(response => {
-            if (response.body.XErr) {
-                switch (response.body.XErr) {
-                    case 2148916233:
-                        reject({
-                            message: 'Your Microsoft account is not connected to an Xbox account. Please create one before continuing.<br>'
-                        })
-                        return
-        
-                    case 2148916238: 
-                        reject({
-                            message: 'Since you are not yet 18 years old, an adult must add you to a family in order for you to use Helios Launcher!'
-                        })
-                        return
-                }
-                reject(response.body)
-            }
-            resolve(response.body.Token)
+            const body = response.body
+
+            resolve(body.Token)
         }).catch(error => {
             reject(error)
         })
@@ -182,27 +168,8 @@ exports.authMinecraft = async accessToken => {
 
         return MCToken
     } catch (error) {
-        await Promise.reject(error)
+        Promise.reject(error)
     }
-}
-
-exports.checkMCStore = async function(access_token){
-    return new Promise((resolve, reject) => {
-        request.get({
-            url: 'https://api.minecraftservices.com/entitlements/mcstore',
-            json: true,
-            headers: {
-                Authorization: 'Bearer ' + access_token
-            }
-        }, (err, res, body) => {
-            if (err) {
-                resolve(false)
-                return
-            }
-            if(body.items && body.items.length > 0) resolve(true)
-            else resolve(false)
-        })
-    })
 }
 
 exports.getMCProfile = MCAccessToken => {
@@ -215,9 +182,10 @@ exports.getMCProfile = MCAccessToken => {
         }
         requestPromise(profileURI, options).then(response => {
             const body = JSON.parse(response.body)
+
             resolve(body)
         }).catch(error => {
             reject(error)
         })
     })
-}  
+}
