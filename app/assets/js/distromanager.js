@@ -469,13 +469,6 @@ class DistroIndex {
     }
 
     /**
-     * @returns {string} The URL to the news RSS feed.
-     */
-    getRSS(){
-        return this.rss
-    }
-
-    /**
      * @returns {Array.<Server>} An array of declared server configurations.
      */
     getServers(){
@@ -537,7 +530,7 @@ exports.pullRemote = function(){
         return exports.pullLocal()
     }
     return new Promise((resolve, reject) => {
-        const distroURL = 'https://dgfe.dk/Modded/distrobution.json'
+        const distroURL = 'https://dgfe.dk/Modded/distribution.json'
         //const distroURL = 'https://gist.githubusercontent.com/dscalzi/53b1ba7a11d26a5c353f9d5ae484b71b/raw/'
         const opts = {
             url: distroURL,

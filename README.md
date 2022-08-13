@@ -1,6 +1,8 @@
 <p align="center"><img src="./app/assets/images/SealCircle.png" width="150px" height="150px" alt="aventium softworks"></p>
 
-<h1 align="center">Zayviel Launcher</h1>
+<h1 align="center">Helios Launcher</h1>
+
+<em><h5 align="center">(formerly Electron Launcher)</h5></em>
 
 [<p align="center"><img src="https://img.shields.io/travis/com/XXdaugonXX/ZayvielLauncher?style=for-the-badge" alt="travis">](https://travis-ci.org/XXdaugonXX/ZayvielLauncher) [<img src="https://img.shields.io/github/downloads/XXdaugonXX/ZayvielLauncher/latest/total?style=for-the-badge" alt="downloads">](https://github.com/XXdaguonXX/ZayvielLauncher/releases)
 
@@ -13,6 +15,7 @@
 
 * 🔒 Full account management.
   * Add multiple accounts and easily switch between them.
+  * Microsoft (OAuth 2.0) + Mojang (Yggdrasil) authentication fully supported.
   * Credentials are never stored and transmitted directly to Mojang.
 * 📂 Efficient asset management.
   * Receive client updates as soon as we release them.
@@ -20,7 +23,6 @@
 * ☕ **Automatic Java validation.**
   * If you have an incompatible version of Java installed, we'll install the right one *for you*.
   * You do not need to have Java installed to run the launcher.
-* 📰 News feed natively built into the launcher.
 * ⚙️ Intuitive settings management, including a Java control panel.
 * Supports all of our servers.
   * Switch between server configurations with ease.
@@ -52,7 +54,8 @@ If you download from the [Releases](https://github.com/XXdaugonXX/ZayvielLaunche
 | Platform | File |
 | -------- | ---- |
 | Windows x64 | `Zayviel-Launcher-setup-VERSION.exe` |
-| macOS | `Zayviel-Launcher-setup-VERSION.dmg` |
+| macOS x64 | `Zayviel-Launcher-setup-VERSION-x64.dmg` |
+| macOS arm64 | `Zayviel-Launcher-setup-VERSION-arm64.dmg` |
 | Linux x64 | `Zayviel-Launcher-setup-VERSION.AppImage` |
 
 ## Console
@@ -80,7 +83,7 @@ This section details the setup of a basic developmentment environment.
 
 **System Requirements**
 
-* [Node.js][nodejs] v14
+* [Node.js][nodejs] v16
 
 ---
 
@@ -175,14 +178,9 @@ Note that you **cannot** open the DevTools window while using this debug configu
 
 ### Note on Third-Party Usage
 
-You may use this software in your own project so long as the following conditions are met.
+Please give credit to the original author and provide a link to the original source. This is free software, please do at least this much.
 
-* Credit is expressly given to the original authors (Daniel Scalzi).
-  * Include a link to the original source on the launcher's About page.
-  * Credit the authors and provide a link to the original source in any publications or download pages.
-* The source code remain **public** as a fork of this repository.
-
-We reserve the right to update these conditions at any time, please check back periodically.
+For instructions on setting up Microsoft Authentication, see https://github.com/dscalzi/HeliosLauncher/blob/master/docs/MicrosoftAuth.md.
 
 ---
 
@@ -190,7 +188,7 @@ We reserve the right to update these conditions at any time, please check back p
 
 * [Wiki][wiki]
 * [Nebula (Create Distribution.json)][nebula]
-* [v2 Rewrite Branch (WIP)][v2branch]
+* [v2 Rewrite Branch (Inactive)][v2branch]
 
 The best way to contact the developers is on Discord.
 
@@ -207,6 +205,6 @@ The best way to contact the developers is on Discord.
 [rendererprocess]: https://electronjs.org/docs/tutorial/application-architecture#main-and-renderer-processes 'Renderer Process'
 [chromedebugger]: https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome 'Debugger for Chrome'
 [discord]: https://discord.gg/zNWUXdt 'Discord'
-[wiki]: https://github.com/XXdaugonXX/ZayvielLauncher/wiki 'wiki'
+[wiki]: https://github.com/dscalzi/HeliosLauncher/wiki 'wiki'
 [nebula]: https://github.com/dscalzi/Nebula 'dscalzi/Nebula'
 [v2branch]: https://github.com/dscalzi/HeliosLauncher/tree/ts-refactor 'v2 branch'

@@ -2,16 +2,15 @@ const remoteMain = require('@electron/remote/main')
 remoteMain.initialize()
 
 // Requirements
-const { app, BrowserWindow, ipcMain, Menu } = require('electron')
-const autoUpdater                   = require('electron-updater').autoUpdater
-const ejse                          = require('ejs-electron')
-const fs                            = require('fs')
-const isDev                         = require('./app/assets/js/isdev')
-const path                          = require('path')
-const semver                        = require('semver')
-const { pathToFileURL }             = require('url')
-
-const redirectUriPrefix = 'https://login.microsoftonline.com/common/oauth2/nativeclient?'
+const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron')
+const autoUpdater                       = require('electron-updater').autoUpdater
+const ejse                              = require('ejs-electron')
+const fs                                = require('fs')
+const isDev                             = require('./app/assets/js/isdev')
+const path                              = require('path')
+const semver                            = require('semver')
+const { pathToFileURL }                 = require('url')
+const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
 
 // Setup auto updater.
 function initAutoUpdater(event, data) {
@@ -86,49 +85,135 @@ ipcMain.on('distributionIndexDone', (event, res) => {
     event.sender.send('distributionIndexDone', res)
 })
 
+// Handle trash item.
+ipcMain.handle(SHELL_OPCODE.TRASH_ITEM, async (event, ...args) => {
+    try {
+        await shell.trashItem(args[0])
+        return {
+            result: true
+        }
+    } catch(error) {
+        return {
+            result: false,
+            error: error
+        }
+    }
+})
+
 // Disable hardware acceleration.
 // https://electronjs.org/docs/tutorial/offscreen-rendering
 app.disableHardwareAcceleration()
 
-let MSALoginWindow = null
 
-// Open the Microsoft Account Login window
-ipcMain.on('openMSALoginWindow', (ipcEvent, args) => {
-    if(MSALoginWindow != null){
-        ipcEvent.sender.send('MSALoginWindowNotification', 'error', 'AlreadyOpenException')
+const REDIRECT_URI_PREFIX = 'https://login.microsoftonline.com/common/oauth2/nativeclient?'
+
+// Microsoft Auth Login
+let msftAuthWindow
+let msftAuthSuccess
+let msftAuthViewSuccess
+let msftAuthViewOnClose
+ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
+    if (msftAuthWindow) {
+        ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.ERROR, MSFT_ERROR.ALREADY_OPEN, msftAuthViewOnClose)
         return
     }
-    MSALoginWindow = new BrowserWindow({
-        minWidth: 600,
-        minHeight: 400,
-        width: 600,
-        height: 400,
-        contextIsolation: false
+    msftAuthSuccess = false
+    msftAuthViewSuccess = arguments_[0]
+    msftAuthViewOnClose = arguments_[1]
+    msftAuthWindow = new BrowserWindow({
+        title: 'Microsoft Login',
+        backgroundColor: '#222222',
+        width: 520,
+        height: 600,
+        frame: true,
+        icon: getPlatformIcon('SealCircle')
     })
 
-    MSALoginWindow.on('closed', () => {
-        MSALoginWindow = null
+    msftAuthWindow.on('closed', () => {
+        msftAuthWindow = undefined
     })
 
-    MSALoginWindow.webContents.on('did-navigate', (event, uri, responseCode, statusText) => {
-        if(uri.startsWith(redirectUriPrefix)) {
-            let querys = uri.substring(redirectUriPrefix.length).split('#', 1).toString().split('&')
-            let queryMap = new Map()
-
-            querys.forEach(query => {
-                let arr = query.split('=')
-                queryMap.set(arr[0], decodeURI(arr[1]))
-            })
-
-            ipcEvent.reply('MSALoginWindowReply', queryMap)
-
-            MSALoginWindow.close()
-            MSALoginWindow = null
+    msftAuthWindow.on('close', () => {
+        if(!msftAuthSuccess) {
+            ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.ERROR, MSFT_ERROR.NOT_FINISHED, msftAuthViewOnClose)
         }
     })
 
-    MSALoginWindow.removeMenu()
-    MSALoginWindow.loadURL('https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=d5b2c390-be84-4057-a249-8a26d8f360bc&response_type=code&scope=XboxLive.signin%20offline_access&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient')
+    msftAuthWindow.webContents.on('did-navigate', (_, uri) => {
+        if (uri.startsWith(REDIRECT_URI_PREFIX)) {
+            let queries = uri.substring(REDIRECT_URI_PREFIX.length).split('#', 1).toString().split('&')
+            let queryMap = {}
+
+            queries.forEach(query => {
+                const [name, value] = query.split('=')
+                queryMap[name] = decodeURI(value)
+            })
+
+            ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.SUCCESS, queryMap, msftAuthViewSuccess)
+
+            msftAuthSuccess = true
+            msftAuthWindow.close()
+            msftAuthWindow = null
+        }
+    })
+
+    msftAuthWindow.removeMenu()
+    msftAuthWindow.loadURL(`https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?prompt=select_account&client_id=${AZURE_CLIENT_ID}&response_type=code&scope=XboxLive.signin%20offline_access&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient`)
+})
+
+// Microsoft Auth Logout
+let msftLogoutWindow
+let msftLogoutSuccess
+let msftLogoutSuccessSent
+ipcMain.on(MSFT_OPCODE.OPEN_LOGOUT, (ipcEvent, uuid, isLastAccount) => {
+    if (msftLogoutWindow) {
+        ipcEvent.reply(MSFT_OPCODE.REPLY_LOGOUT, MSFT_REPLY_TYPE.ERROR, MSFT_ERROR.ALREADY_OPEN)
+        return
+    }
+
+    msftLogoutSuccess = false
+    msftLogoutSuccessSent = false
+    msftLogoutWindow = new BrowserWindow({
+        title: 'Microsoft Logout',
+        backgroundColor: '#222222',
+        width: 520,
+        height: 600,
+        frame: true,
+        icon: getPlatformIcon('SealCircle')
+    })
+
+    msftLogoutWindow.on('closed', () => {
+        msftLogoutWindow = undefined
+    })
+
+    msftLogoutWindow.on('close', () => {
+        if(!msftLogoutSuccess) {
+            ipcEvent.reply(MSFT_OPCODE.REPLY_LOGOUT, MSFT_REPLY_TYPE.ERROR, MSFT_ERROR.NOT_FINISHED)
+        } else if(!msftLogoutSuccessSent) {
+            msftLogoutSuccessSent = true
+            ipcEvent.reply(MSFT_OPCODE.REPLY_LOGOUT, MSFT_REPLY_TYPE.SUCCESS, uuid, isLastAccount)
+        }
+    })
+    
+    msftLogoutWindow.webContents.on('did-navigate', (_, uri) => {
+        if(uri.startsWith('https://login.microsoftonline.com/common/oauth2/v2.0/logoutsession')) {
+            msftLogoutSuccess = true
+            setTimeout(() => {
+                if(!msftLogoutSuccessSent) {
+                    msftLogoutSuccessSent = true
+                    ipcEvent.reply(MSFT_OPCODE.REPLY_LOGOUT, MSFT_REPLY_TYPE.SUCCESS, uuid, isLastAccount)
+                }
+
+                if(msftLogoutWindow) {
+                    msftLogoutWindow.close()
+                    msftLogoutWindow = null
+                }
+            }, 5000)
+        }
+    })
+    
+    msftLogoutWindow.removeMenu()
+    msftLogoutWindow.loadURL('https://login.microsoftonline.com/common/oauth2/v2.0/logout')
 })
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -185,15 +270,13 @@ function createMenu() {
                 accelerator: 'Command+Q',
                 click: () => {
                     app.quit()
-                    if(MSALoginWindow !== null) MSALoginWindow.close()
-                    MSALoginWindow = null
                 }
             }]
         }
 
         // New edit menu adds support for text-editing keyboard shortcuts
         let editSubMenu = {
-            label: 'Ændre',
+            label: 'Edit',
             submenu: [{
                 label: 'Undo',
                 accelerator: 'CmdOrCtrl+Z',
