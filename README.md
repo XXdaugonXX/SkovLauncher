@@ -1,15 +1,8 @@
 <p align="center"><img src="./app/assets/images/SealCircle.png" width="150px" height="150px" alt="aventium softworks"></p>
 
-<h1 align="center">Helios Launcher</h1>
+<h1 align="center">Zayviel Launcher</h1>
 
 <em><h5 align="center">(formerly Electron Launcher)</h5></em>
-
-[<p align="center"><img src="https://img.shields.io/travis/com/XXdaugonXX/ZayvielLauncher?style=for-the-badge" alt="travis">](https://travis-ci.org/XXdaugonXX/ZayvielLauncher) [<img src="https://img.shields.io/github/downloads/XXdaugonXX/ZayvielLauncher/latest/total?style=for-the-badge" alt="downloads">](https://github.com/XXdaguonXX/ZayvielLauncher/releases)
-
-<p align="center">Join modded servers without worrying about installing Java, Forge, or other mods. We'll handle that for you.</p>
-
-![Screenshot 1](https://i.imgur.com/6o7SmH6.png)
-![Screenshot 2](https://i.imgur.com/x3B34n1.png)
 
 ## Features
 
@@ -23,6 +16,7 @@
 * ☕ **Automatic Java validation.**
   * If you have an incompatible version of Java installed, we'll install the right one *for you*.
   * You do not need to have Java installed to run the launcher.
+* 📰 News feed natively built into the launcher.
 * ⚙️ Intuitive settings management, including a Java control panel.
 * Supports all of our servers.
   * Switch between server configurations with ease.
@@ -38,25 +32,25 @@ This is not an exhaustive list. Download and install the launcher to gauge all i
 
 ## Downloads
 
-You can download from [GitHub Releases](https://github.com/XXdaugonXX/ZayvielLauncher/releases)
+You can download from [GitHub Releases](https://github.com/dscalzi/HeliosLauncher/releases)
 
 #### Latest Release
 
-[![](https://img.shields.io/github/release/XXdaugonXX/ZayvielLauncher.svg?style=flat-square)](https://github.com/XXdaugonXX/ZayvielLauncher/releases/latest)
+[![](https://img.shields.io/github/release/dscalzi/HeliosLauncher.svg?style=flat-square)](https://github.com/dscalzi/HeliosLauncher/releases/latest)
 
 #### Latest Pre-Release
-[![](https://img.shields.io/github/release/XXdaugonXX/ZayvielLauncher/all.svg?style=flat-square)](https://github.com/XXdaugonXX/ZayvielLauncher/releases)
+[![](https://img.shields.io/github/release/dscalzi/HeliosLauncher/all.svg?style=flat-square)](https://github.com/dscalzi/HeliosLauncher/releases)
 
 **Supported Platforms**
 
-If you download from the [Releases](https://github.com/XXdaugonXX/ZayvielLauncher/releases) tab, select the installer for your system.
+If you download from the [Releases](https://github.com/dscalzi/HeliosLauncher/releases) tab, select the installer for your system.
 
 | Platform | File |
 | -------- | ---- |
-| Windows x64 | `Zayviel-Launcher-setup-VERSION.exe` |
-| macOS x64 | `Zayviel-Launcher-setup-VERSION-x64.dmg` |
-| macOS arm64 | `Zayviel-Launcher-setup-VERSION-arm64.dmg` |
-| Linux x64 | `Zayviel-Launcher-setup-VERSION.AppImage` |
+| Windows x64 | `Helios-Launcher-setup-VERSION.exe` |
+| macOS x64 | `Helios-Launcher-setup-VERSION-x64.dmg` |
+| macOS arm64 | `Helios-Launcher-setup-VERSION-arm64.dmg` |
+| Linux x64 | `Helios-Launcher-setup-VERSION.AppImage` |
 
 ## Console
 
@@ -83,15 +77,15 @@ This section details the setup of a basic developmentment environment.
 
 **System Requirements**
 
-* [Node.js][nodejs] v16
+* [Node.js][nodejs] v18
 
 ---
 
 **Clone and Install Dependencies**
 
 ```console
-> git clone https://github.com/XXdaugonXX/ZayvielLauncher.git
-> cd ZayvielLauncher
+> git clone https://github.com/dscalzi/HeliosLauncher.git
+> cd HeliosLauncher
 > npm install
 ```
 

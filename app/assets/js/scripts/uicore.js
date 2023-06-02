@@ -10,11 +10,9 @@ const {ipcRenderer, shell, webFrame} = require('electron')
 const remote                         = require('@electron/remote')
 const isDev                          = require('./assets/js/isdev')
 const { LoggerUtil }                 = require('helios-core')
-const LoggerUtil1                    = require('./assets/js/loggerutil')
 
-const loggerUICore             = LoggerUtil1('%c[UICore]', 'color: #000668; font-weight: bold')
-const loggerAutoUpdater        = LoggerUtil1('%c[AutoUpdater]', 'color: #000668; font-weight: bold')
-const loggerAutoUpdaterSuccess = LoggerUtil1('%c[AutoUpdater]', 'color: #209b07; font-weight: bold')
+const loggerUICore             = LoggerUtil.getLogger('UICore')
+const loggerAutoUpdater        = LoggerUtil.getLogger('AutoUpdater')
 
 // Log deprecation and process warnings.
 process.traceProcessWarnings = true
@@ -43,21 +41,21 @@ if(!isDev){
     ipcRenderer.on('autoUpdateNotification', (event, arg, info) => {
         switch(arg){
             case 'checking-for-update':
-                loggerAutoUpdater.log('Checking for update..')
+                loggerAutoUpdater.info('Checking for update..')
                 settingsUpdateButtonStatus('Checking for Updates..', true)
                 break
             case 'update-available':
-                loggerAutoUpdaterSuccess.log('New update available', info.version)
+                loggerAutoUpdater.info('New update available', info.version)
                 
                 if(process.platform === 'darwin'){
-                    info.darwindownload = `https://github.com/dscalzi/ZayvielLauncher/releases/download/v${info.version}/Zayviel-Launcher-setup-${info.version}${process.arch === 'arm64' ? '-arm64' : '-x64'}.dmg`
+                    info.darwindownload = `https://github.com/XXdaugonXX/ZayvielLauncher/releases/download/v${info.version}/Zayviel-Launcher-setup-${info.version}${process.arch === 'arm64' ? '-arm64' : '-x64'}.dmg`
                     showUpdateUI(info)
                 }
                 
                 populateSettingsUpdateInformation(info)
                 break
             case 'update-downloaded':
-                loggerAutoUpdaterSuccess.log('Update ' + info.version + ' ready to be installed.')
+                loggerAutoUpdater.info('Update ' + info.version + ' ready to be installed.')
                 settingsUpdateButtonStatus('Install Now', false, () => {
                     if(!isDev){
                         ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
@@ -66,8 +64,8 @@ if(!isDev){
                 showUpdateUI(info)
                 break
             case 'update-not-available':
-                loggerAutoUpdater.log('No new update found.')
-                settingsUpdateButtonStatus('Søg Efter Opdateringer')
+                loggerAutoUpdater.info('No new update found.')
+                settingsUpdateButtonStatus('Check for Updates')
                 break
             case 'ready':
                 updateCheckListener = setInterval(() => {
@@ -78,9 +76,9 @@ if(!isDev){
             case 'realerror':
                 if(info != null && info.code != null){
                     if(info.code === 'ERR_UPDATER_INVALID_RELEASE_FEED'){
-                        loggerAutoUpdater.log('No suitable releases found.')
+                        loggerAutoUpdater.info('No suitable releases found.')
                     } else if(info.code === 'ERR_XML_MISSED_ELEMENT'){
-                        loggerAutoUpdater.log('No releases found.')
+                        loggerAutoUpdater.info('No releases found.')
                     } else {
                         loggerAutoUpdater.error('Error during update check..', info)
                         loggerAutoUpdater.debug('Error Code:', info.code)
@@ -88,7 +86,7 @@ if(!isDev){
                 }
                 break
             default:
-                loggerAutoUpdater.log('Unknown argument', arg)
+                loggerAutoUpdater.info('Unknown argument', arg)
                 break
         }
     })
@@ -131,12 +129,12 @@ function showUpdateUI(info){
 
 /* jQuery Example
 $(function(){
-    loggerUICore.log('UICore Initialized');
+    loggerUICore.info('UICore Initialized');
 })*/
 
 document.addEventListener('readystatechange', function () {
     if (document.readyState === 'interactive'){
-        loggerUICore.log('UICore Initializing..')
+        loggerUICore.info('UICore Initializing..')
 
         // Bind close button.
         Array.from(document.getElementsByClassName('fCb')).map((val) => {
